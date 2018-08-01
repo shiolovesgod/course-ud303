@@ -13,6 +13,7 @@ memory = []
 
 form = '''<!DOCTYPE html>
   <title>Message Board</title>
+  <h1>Message Board</h1>
   <form method="POST">
     <textarea name="message"></textarea>
     <br>
@@ -41,6 +42,9 @@ class MessageHandler(BaseHTTPRequestHandler):
         memory.append(message)
 
         # 1. Send a 303 redirect back to the root page.
+        self.send_response(303)
+        self.send_header('Location', '/')
+        self.end_headers()
 
     def do_GET(self):
         # First, send a 200 OK response.
@@ -51,8 +55,14 @@ class MessageHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
         # 2. Put the response together out of the form and the stored messages.
-
         # 3. Send the response.
+        self.wfile.write(form.encode())
+        self.wfile.write('<h2>Message List</h2>'.encode())
+     
+        if len(memory) > 0:
+          self.wfile.write('<br/>'.join(memory).encode())
+        else:
+          self.wfile.write('No messages found.'.encode)
 
 if __name__ == '__main__':
     server_address = ('', 8000)
