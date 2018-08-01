@@ -24,10 +24,19 @@ from urllib.parse import parse_qs
 class MessageHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         # 1. How long was the message? (Use the Content-Length header.)
+        data_length = int(self.headers.get('Content-Length',0))
 
         # 2. Read the correct amount of data from the request.
+        data = self.rfile.read(data_length).decode()
 
         # 3. Extract the "message" field from the request data.
+        parsed_data = parse_qs(data)
+        message = parsed_data.get('message','')
+
+        if len(message) < 1:
+            message = 'empty message'
+        else:
+            message = message[0]
 
         # Send the "message" field back as the response.
         self.send_response(200)
